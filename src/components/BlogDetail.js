@@ -1,3 +1,5 @@
+import PropTypes from "prop-types"
+
 const BlogDetail = ({ blog, like, deleteBlog }) => {
   return (
     <div>
@@ -9,6 +11,12 @@ const BlogDetail = ({ blog, like, deleteBlog }) => {
       <button onClick={deleteBlog(blog)}>remove</button>
     </div>
   )
+}
+
+BlogDetail.propTypes = {
+  blog: PropTypes.object.isRequired,
+  like: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
 }
 
 export default BlogDetail

@@ -1,5 +1,6 @@
 import "../assets/css/blogs.css"
 import { useState } from "react"
+import PropTypes from "prop-types"
 
 const Blog = ({ blog, children }) => {
   const [visible, setVisible] = useState(false)
@@ -13,6 +14,10 @@ const Blog = ({ blog, children }) => {
       {visible && children}
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
 }
 
 export default Blog
