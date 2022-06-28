@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Blog from "./components/Blog"
 import BlogForm from "./components/BlogForm"
 import LoginForm from "./components/LoginForm"
 import UserInfo from "./components/UserInfo"
 import Notification from "./components/Notification"
+import Togglable from "./components/Togglable"
+import BlogDetail from "./components/BlogDetail"
 import blogService from "./services/blogs"
 import loginServices from "./services/login"
 
@@ -12,19 +14,18 @@ const App = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState("")
-  const [author, setAuthor] = useState("")
-  const [url, setUrl] = useState("")
   const [notificationMessage, setNotificationMessage] = useState({
     message: "",
     type: "",
     show: false,
   })
 
+  const blogFormRef = useRef()
+
   useEffect(() => {
     async function fetchBlog() {
       const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
     }
     fetchBlog()
   }, [])
@@ -69,18 +70,10 @@ const App = () => {
     window.localStorage.removeItem("loggedBlogappUser")
   }
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-    const newBlog = {
-      title,
-      author,
-      url,
-    }
+  const handleCreateBlog = async (newBlog) => {
     const blog = await blogService.create(newBlog)
     setBlogs(blogs.concat(blog))
-    setTitle("")
-    setAuthor("")
-    setUrl("")
+    blogFormRef.current.toggleVisibility()
     setNotificationMessage({
       message: `a new blog ${blog.title} by ${blog.author} added`,
       type: "success",
@@ -93,6 +86,35 @@ const App = () => {
         show: false,
       })
     }, 5000)
+  }
+
+  const handleLike = (id) => async () => {
+    const blog = await blogService.likeBlog(id)
+    setBlogs(blogs.map((b) => (b.id !== id ? b : blog)))
+  }
+
+  const handleDelete = (blog) => async () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        await blogService.deleteBlog(blog.id)
+        setBlogs(blogs.filter((b) => b.id !== blog.id))
+      } catch (error) {
+        if (error.response.status === 401) {
+          setNotificationMessage({
+            message: "You are not authorized to delete this blog",
+            type: "error",
+            show: true,
+          })
+          setTimeout(() => {
+            setNotificationMessage({
+              message: "",
+              type: "",
+              show: false,
+            })
+          }, 5000)
+        }
+      }
+    }
   }
 
   return (
@@ -116,17 +138,17 @@ const App = () => {
         <div>
           <h1>Blogs</h1>
           <UserInfo user={user} handleLogout={handleLogout} />
-          <BlogForm
-            title={title}
-            author={author}
-            url={url}
-            setTitle={setTitle}
-            setAuthor={setAuthor}
-            setUrl={setUrl}
-            onSubmit={handleCreateBlog}
-          />
+          <Togglable buttonLabel={"Creates new blog"} ref={blogFormRef}>
+            <BlogForm createBlog={handleCreateBlog} />
+          </Togglable>
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog}>
+              <BlogDetail
+                blog={blog}
+                like={handleLike}
+                deleteBlog={handleDelete}
+              />
+            </Blog>
           ))}
         </div>
       )}
