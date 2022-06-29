@@ -52,7 +52,7 @@ const BlogForm = ({ createBlog }) => {
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button style={{ marginTop: "1rem" }} type="submit">
+        <button id="create-button" style={{ marginTop: "1rem" }} type="submit">
           Submit
         </button>
       </form>

@@ -20,7 +20,9 @@ const Togglable = forwardRef(({ buttonLabel, children }, ref) => {
   return (
     <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{buttonLabel}</button>
+        <button id="show-form-button" onClick={toggleVisibility}>
+          {buttonLabel}
+        </button>
       </div>
       <div style={showWhenVisible} className="togglableContent">
         {children}

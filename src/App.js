@@ -119,6 +119,7 @@ const App = () => {
 
   return (
     <div>
+      <h1>Blogs</h1>
       {user === null && (
         <LoginForm
           username={username}
@@ -136,7 +137,6 @@ const App = () => {
       )}
       {user !== null && (
         <div>
-          <h1>Blogs</h1>
           <UserInfo user={user} handleLogout={handleLogout} />
           <Togglable buttonLabel={"Creates new blog"} ref={blogFormRef}>
             <BlogForm createBlog={handleCreateBlog} />

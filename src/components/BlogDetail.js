@@ -11,7 +11,9 @@ const BlogDetail = ({ blog, like, deleteBlog }) => {
         </button>
       </p>
       <p>{blog.user.name}</p>
-      <button onClick={deleteBlog(blog)}>remove</button>
+      <button id="delete-button" onClick={deleteBlog(blog)}>
+        remove
+      </button>
     </div>
   )
 }
